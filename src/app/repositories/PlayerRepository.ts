@@ -1,12 +1,13 @@
 import { and, eq } from "drizzle-orm";
 
 import { db } from "../../db";
-import { playersTable } from "../../db/schema";
+import { playersTable, teamsTable } from "../../db/schema";
 
 interface ICreateProps {
   name: string;
   playerType: "player" | "goalkeeper";
   matchDay: string;
+  teamId: string;
   ipPlayer: string;
 }
 
@@ -23,7 +24,8 @@ class PlayerRepository {
     const rows = await db
       .select()
       .from(playersTable)
-      .where(eq(playersTable.matchDay, matchDay));
+      .where(eq(playersTable.matchDay, matchDay))
+      .innerJoin(teamsTable, eq(playersTable.teamId, teamsTable.id));
 
     return rows;
   }
@@ -38,10 +40,6 @@ class PlayerRepository {
       ));
 
     return rows[0];
-  }
-
-  async insertTeamIntoPlayer(teamId: string, playerId: string) {
-    await db.update(playersTable).set({ teamId }).where(eq(playersTable.id, playerId));
   }
 
   async delete(id: string) {
