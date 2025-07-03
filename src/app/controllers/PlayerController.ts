@@ -1,6 +1,7 @@
 import { Request, Response } from "express";
 
 import PlayerRepository from "../repositories/PlayerRepository";
+import { drawTeam } from "../../utils/drawTeam";
 
 class PlayerController {
   async index(req: Request, res: Response) {
@@ -47,11 +48,18 @@ class PlayerController {
     try {
       const now = new Date().toISOString().split("T")[0];
 
-      const playerRegistered = await PlayerRepository
-        .findByIpPlaler(String(ipPlayer), now);
-      if (playerRegistered) {
+      // const playerRegistered = await PlayerRepository
+      //   .findByIpPlaler(String(ipPlayer), now);
+      // if (playerRegistered) {
+      //   return res.status(400).json({
+      //     error: "Voce já se cadastrou.",
+      //   });
+      // }
+      const teamId = await drawTeam(playerType);
+
+      if (!teamId) {
         return res.status(400).json({
-          error: "Voce já se cadastrou.",
+          error: `Todos os times estão com ${playerType === "player" ? "jogadores" : "goleiros"} completos.`,
         });
       }
 
@@ -59,6 +67,7 @@ class PlayerController {
         name,
         playerType,
         matchDay: now,
+        teamId: String(teamId),
         ipPlayer: String(ipPlayer),
       });
 
