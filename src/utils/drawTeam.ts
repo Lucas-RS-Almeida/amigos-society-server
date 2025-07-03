@@ -13,10 +13,15 @@ export async function drawTeam(playerType: "player" | "goalkeeper") {
   const teams = await db.select().from(teamsTable);
   const players = await db.select().from(playersTable);
 
+  const matchDay = new Date().toISOString().split("T")[0];
+
   const counts: ICountsProps[] = teams.map((team) => {
-    const allPlayersTeam = players.filter((p) => p.teamId === team.id);
-    const totalGoalkeepers = allPlayersTeam.filter((p) => p.playerType === "goalkeeper").length;
-    const totalPlayers = allPlayersTeam.filter((p) => p.playerType === "player").length;
+    const allPlayersTeam = players
+      .filter((p) => (p.teamId === team.id) && (p.matchDay === matchDay));
+    const totalGoalkeepers = allPlayersTeam
+      .filter((p) => p.playerType === "goalkeeper").length;
+    const totalPlayers = allPlayersTeam
+      .filter((p) => p.playerType === "player").length;
 
     return {
       teamId: team.id,
