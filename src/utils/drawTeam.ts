@@ -6,35 +6,34 @@ import { teamsTable, playersTable } from "../db/schema";
 interface ICountsProps {
   teamId: string;
   total: number;
+  withVacancy: boolean;
 }
 
 export async function drawTeam(playerType: "player" | "goalkeeper") {
-  const counts: ICountsProps[] = [];
-
   const teams = await db.select().from(teamsTable);
+  const players = await db.select().from(playersTable);
 
-  for (const team of teams) {
-    const teamPlayers = await db.select()
-      .from(playersTable)
-      .where(eq(playersTable.teamId, team.id));
+  const counts: ICountsProps[] = teams.map((team) => {
+    const allPlayersTeam = players.filter((p) => p.teamId === team.id);
+    const totalGoalkeepers = allPlayersTeam.filter((p) => p.playerType === "goalkeeper").length;
+    const totalPlayers = allPlayersTeam.filter((p) => p.playerType === "player").length;
 
-    const totalGoalkeepers = teamPlayers.filter((p) => p.playerType === "goalkeeper").length;
-    const totalPlayers = teamPlayers.filter((p) => p.playerType === "player").length;
-
-    if (playerType === "goalkeeper" && totalGoalkeepers < 1) {
-      counts.push({ teamId: team.id, total: totalGoalkeepers });
+    return {
+      teamId: team.id,
+      total: playerType === "goalkeeper" ? totalGoalkeepers : totalPlayers,
+      withVacancy: playerType === "goalkeeper"
+        ? totalGoalkeepers < 1
+        : totalPlayers < 5,
     }
+  });
 
-    if (playerType === "player" && totalPlayers < 5) {
-      counts.push({ teamId: team.id, total: totalPlayers });
-    }
+  const withVacancy = counts.filter((w) => w.withVacancy);
 
-    if (counts.length === 0) {
-      return null;
-    }
-
-    counts.sort((a, b) => a.total - b.total);
-
-    return counts[0].teamId;
+  if (withVacancy.length === 0) {
+    return null;
   }
+
+  withVacancy.sort((a, b) => a.total - b.total);
+
+  return withVacancy[0].teamId;
 }
