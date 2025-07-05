@@ -5,12 +5,19 @@ import PlayerController from "./app/controllers/PlayerController";
 import TeamController from "./app/controllers/TeamController";
 
 import auth from "./middlewares/auth";
+import checkUser from "./middlewares/checkUser";
 
 const routes = Router();
 
 // Routes to authentication
 routes.post("/auth/log-in", AuthController.index as any);
 routes.post("/auth/sign-up", AuthController.store as any);
+routes.get(
+  "/auth/check-user",
+  auth as any,
+  checkUser as any,
+  AuthController.check,
+);
 
 // Routes to players
 routes.get("/players/:matchDay", auth as any, PlayerController.index);
