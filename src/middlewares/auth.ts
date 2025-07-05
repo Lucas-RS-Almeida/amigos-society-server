@@ -3,7 +3,7 @@ import jwt from 'jsonwebtoken';
 import "dotenv/config";
 
 interface IEncodedProps {
-  token_random: string;
+  tokenRandom: string;
 }
 
 export default function auth(req: Request, res: Response, next: NextFunction) {
@@ -28,9 +28,9 @@ export default function auth(req: Request, res: Response, next: NextFunction) {
       return res.status(501).json({ error: 'Invalid token' });
     }
 
-    const { token_random } = encoded as IEncodedProps;
+    const { tokenRandom } = encoded as IEncodedProps;
 
-    req.token_random = token_random;
+    req.tokenRandom = tokenRandom;
 
     next();
   });
