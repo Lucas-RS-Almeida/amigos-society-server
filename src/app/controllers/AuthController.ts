@@ -55,6 +55,10 @@ class AuthController {
     }
   }
 
+  async check(_: Request, res: Response) {
+    res.sendStatus(200);
+  }
+
   async store(req: Request, res: Response) {
     const { name, password } = req.body;
 
