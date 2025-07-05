@@ -19,5 +19,13 @@ export default async function checkUser(
     });
   }
 
+  const now = new Date();
+
+  if (user[0].tokenRandomExpires && user[0].tokenRandomExpires < now) {
+    return res.status(501).json({
+      error: "Seu token expirou, faça login novamente."
+    });
+  }
+
   next();
 }
