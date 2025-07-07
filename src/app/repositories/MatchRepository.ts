@@ -26,6 +26,15 @@ class MatchRepository {
     return rows;
   }
 
+  async findById(id: string) {
+    const row = await db
+      .select()
+      .from(matchesTable)
+      .where(eq(matchesTable.id, id));
+
+    return row[0];
+  }
+
   async create(body: ICreateProps) {
     const values: typeof matchesTable.$inferInsert = body;
 
