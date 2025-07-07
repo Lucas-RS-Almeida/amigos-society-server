@@ -65,6 +65,8 @@ export const matchesTable = pgTable("matches", {
   awayTeamId: uuid("away_team_id").notNull().references(() => teamsTable.id),
   homeScore: integer("home_score").default(0),
   awayScore: integer("away_score").default(0),
+  matchDay: text("matchDay").notNull(),
+  inProgress: boolean("in_progress").default(true),
   createdAt: timestamp("created_at").notNull().defaultNow(),
   updatedAt: timestamp("updated_at")
     .notNull()
