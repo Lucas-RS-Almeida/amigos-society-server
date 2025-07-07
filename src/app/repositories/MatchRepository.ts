@@ -1,0 +1,45 @@
+import { eq, desc } from "drizzle-orm";
+
+import { db } from "../../db";
+import { matchesTable, teamsTable } from "../../db/schema";
+import { alias } from "drizzle-orm/pg-core";
+
+interface ICreateProps {
+  homeTeamId: string;
+  awayTeamId: string;
+  matchDay: string;
+}
+
+class MatchRepository {
+  async find(matchDay: string) {
+    const homeTeam = alias(teamsTable, "home_team");
+    const awayTeam = alias(teamsTable, "away_team");
+
+    const rows = await db
+      .select()
+      .from(matchesTable)
+      .innerJoin(homeTeam, eq(matchesTable.homeTeamId, homeTeam.id))
+      .innerJoin(awayTeam, eq(matchesTable.awayTeamId, awayTeam.id))
+      .where(eq(matchesTable.matchDay, matchDay))
+      .orderBy(desc(matchesTable.createdAt));
+
+    return rows;
+  }
+
+  async create(body: ICreateProps) {
+    const values: typeof matchesTable.$inferInsert = body;
+
+    const row = await db.insert(matchesTable).values(values).returning();
+
+    return row[0];
+  }
+
+  async insertScore(id: string, team: "home" | "away", score: number) {
+    await db
+      .update(matchesTable)
+      .set(team === "home" ? { homeScore: score } : { awayScore: score })
+      .where(eq(matchesTable.id, id));
+  }
+}
+
+export default new MatchRepository();
