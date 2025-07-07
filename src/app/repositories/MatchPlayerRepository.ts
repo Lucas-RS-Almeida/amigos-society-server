@@ -25,7 +25,7 @@ class MatchPlayerRepository {
     const player = alias(playersTable, "player");
     const team = alias(teamsTable, "team");
 
-    const row = await db
+    const rows = await db
       .select()
       .from(matchPlayerTable)
       .innerJoin(match, eq(matchPlayerTable.matchId, match.id))
@@ -33,7 +33,7 @@ class MatchPlayerRepository {
       .innerJoin(team, eq(matchPlayerTable.teamId, team.id))
       .where(eq(matchPlayerTable.matchId, matchId));
 
-    return row[0];
+    return rows;
   }
 
   async findByMatchAndPlayer(matchId: string, playerId: string) {
