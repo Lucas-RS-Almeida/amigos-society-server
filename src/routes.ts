@@ -7,6 +7,7 @@ import TeamController from "./app/controllers/TeamController";
 import auth from "./middlewares/auth";
 import checkUser from "./middlewares/checkUser";
 import MatchContoller from "./app/controllers/MatchContoller";
+import MatchPlayerController from "./app/controllers/MatchPlayerController";
 
 const routes = Router();
 
@@ -53,6 +54,21 @@ routes.post(
   auth as any,
   checkUser as any,
   MatchContoller.store as any,
+);
+
+// Routes to match player
+routes.get("/match-player/:id", MatchPlayerController.index as any);
+routes.post(
+  "/match-player",
+  auth as any,
+  checkUser as any,
+  MatchPlayerController.store as any,
+);
+routes.delete(
+  "/match-player/:id",
+  auth as any,
+  checkUser as any,
+  MatchPlayerController.delete as any,
 );
 
 export default routes;
