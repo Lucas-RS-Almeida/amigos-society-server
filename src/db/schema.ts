@@ -85,7 +85,7 @@ export const matchesTableRelations = relations(matchesTable, ({ one }) => ({
   }),
 }));
 
-export const matchPlayer = pgTable("match_player", {
+export const matchPlayerTable = pgTable("match_player", {
   id: uuid("id").primaryKey().notNull().defaultRandom(),
   matchId: uuid("match_id").notNull().references(() => matchesTable.id),
   playerId: uuid("player_id").notNull().references(() => playersTable.id),
@@ -100,17 +100,17 @@ export const matchPlayer = pgTable("match_player", {
     .$onUpdate(() => new Date()),
 });
 
-export const matchPlayerRelations = relations(matchPlayer, ({ one }) => ({
+export const matchPlayerRelations = relations(matchPlayerTable, ({ one }) => ({
   match: one(matchesTable, {
-    fields: [matchPlayer.matchId],
+    fields: [matchPlayerTable.matchId],
     references: [matchesTable.id],
   }),
   player: one(playersTable, {
-    fields: [matchPlayer.playerId],
+    fields: [matchPlayerTable.playerId],
     references: [playersTable.id],
   }),
   team: one(teamsTable, {
-    fields: [matchPlayer.teamId],
+    fields: [matchPlayerTable.teamId],
     references: [teamsTable.id],
   }),
 }));
