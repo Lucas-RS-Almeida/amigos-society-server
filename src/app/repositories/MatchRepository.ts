@@ -1,4 +1,4 @@
-import { eq, desc } from "drizzle-orm";
+import { eq, desc, sql } from "drizzle-orm";
 
 import { db } from "../../db";
 import { matchesTable, teamsTable } from "../../db/schema";
@@ -43,10 +43,17 @@ class MatchRepository {
     return row[0];
   }
 
-  async insertScore(id: string, team: "home" | "away", score: number) {
+  async insertScore(id: string, team: "home" | "away") {
     await db
       .update(matchesTable)
-      .set(team === "home" ? { homeScore: score } : { awayScore: score })
+      .set(team === "home" ? { homeScore: sql`${matchesTable.homeScore} + 1` } : { awayScore: sql`${matchesTable.awayScore} + 1` })
+      .where(eq(matchesTable.id, id));
+  }
+
+  async endGame(id: string) {
+    await db
+      .update(matchesTable)
+      .set({ inProgress: false })
       .where(eq(matchesTable.id, id));
   }
 }
