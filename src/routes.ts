@@ -7,7 +7,7 @@ import TeamController from "./app/controllers/TeamController";
 import auth from "./middlewares/auth";
 import checkUser from "./middlewares/checkUser";
 import MatchContoller from "./app/controllers/MatchContoller";
-import MatchPlayerController from "./app/controllers/MatchPlayerController";
+import StatisticPlayerController from "./app/controllers/StatisticPlayerController";
 
 const routes = Router();
 
@@ -49,6 +49,12 @@ routes.delete(
 
 // Routes to matches
 routes.get("/matches", MatchContoller.index);
+routes.put(
+  "/matches/:id/end-game",
+  auth as any,
+  checkUser as any,
+  MatchContoller.endGame as any,
+);
 routes.post(
   "/matches",
   auth as any,
@@ -56,19 +62,19 @@ routes.post(
   MatchContoller.store as any,
 );
 
-// Routes to match player
-routes.get("/match-player/:id", MatchPlayerController.index as any);
+// Routes to statistic player
+routes.get("/statistic-player/:id", StatisticPlayerController.index as any);
 routes.post(
-  "/match-player",
+  "/statistic-player",
   auth as any,
   checkUser as any,
-  MatchPlayerController.store as any,
+  StatisticPlayerController.store as any,
 );
 routes.delete(
-  "/match-player/:id",
+  "/statistic-player/:id",
   auth as any,
   checkUser as any,
-  MatchPlayerController.delete as any,
+  StatisticPlayerController.delete as any,
 );
 
 export default routes;
