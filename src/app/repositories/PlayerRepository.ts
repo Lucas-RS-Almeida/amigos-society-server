@@ -33,6 +33,15 @@ class PlayerRepository {
       .select()
       .from(playersTable)
       .where(eq(playersTable.matchDay, matchDay))
+
+    return rows;
+  }
+
+  async findByMatchDayWithTeam(matchDay: string) {
+    const rows = await db
+      .select()
+      .from(playersTable)
+      .where(eq(playersTable.matchDay, matchDay))
       .innerJoin(teamsTable, eq(playersTable.teamId, teamsTable.id));
 
     return rows;
@@ -48,6 +57,13 @@ class PlayerRepository {
       ));
 
     return rows[0];
+  }
+
+  async insertTeam(id: string, teamId: string) {
+    await db
+    .update(playersTable)
+    .set({ teamId })
+    .where(eq(playersTable.id, id));
   }
 
   async delete(id: string) {
