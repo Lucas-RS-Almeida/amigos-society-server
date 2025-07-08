@@ -20,6 +20,15 @@ class PlayerRepository {
     return response;
   }
 
+  async findById(id: string) {
+    const row = await db
+      .select()
+      .from(playersTable)
+      .where(eq(playersTable.id, id));
+
+    return row[0];
+  }
+
   async findByMatchDay(matchDay: string) {
     const rows = await db
       .select()
