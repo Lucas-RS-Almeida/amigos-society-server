@@ -1,7 +1,5 @@
-import { eq } from "drizzle-orm";
-
-import { db } from "../db";
-import { teamsTable, playersTable } from "../db/schema";
+import PlayerRepository from "../app/repositories/PlayerRepository";
+import TeamRepository from "../app/repositories/TeamRepository";
 
 interface ICountsProps {
   teamId: string;
@@ -9,36 +7,40 @@ interface ICountsProps {
   withVacancy: boolean;
 }
 
-export async function drawTeam(playerType: "player" | "goalkeeper") {
-  const teams = await db.select().from(teamsTable);
-  const players = await db.select().from(playersTable);
+function suffleArray<T>(array: T[]): T[] {
+  return array.sort(() => Math.random() - 0.5);
+}
 
-  const matchDay = new Date().toISOString().split("T")[0];
+export async function drawTeam() {
+  const now = new Date().toISOString().split("T")[0];
 
-  const counts: ICountsProps[] = teams.map((team) => {
-    const allPlayersTeam = players
-      .filter((p) => (p.teamId === team.id) && (p.matchDay === matchDay));
-    const totalGoalkeepers = allPlayersTeam
-      .filter((p) => p.playerType === "goalkeeper").length;
-    const totalPlayers = allPlayersTeam
-      .filter((p) => p.playerType === "player").length;
+  const playersToday = await PlayerRepository.findByMatchDay(now);
 
-    return {
-      teamId: team.id,
-      total: playerType === "goalkeeper" ? totalGoalkeepers : totalPlayers,
-      withVacancy: playerType === "goalkeeper"
-        ? totalGoalkeepers < 1
-        : totalPlayers < 5,
-    }
-  });
+  const players = playersToday
+    .filter((pt) => pt.playerType === "player");
+  const gooalKeepers = playersToday
+    .filter((pt) => pt.playerType === "goalkeeper");
 
-  const withVacancy = counts.filter((w) => w.withVacancy);
+  const drawPlayers = suffleArray(players);
+  const drawGoalkeepers = suffleArray(gooalKeepers);
 
-  if (withVacancy.length === 0) {
-    return null;
+  const teams = await TeamRepository.find();
+
+  const teamPlayers = [];
+
+  for (let i = 0; i < 5; i++) {
+    teamPlayers.push(drawPlayers.slice(i * 5, i * 5 + 5));
   }
 
-  withVacancy.sort((a, b) => a.total - b.total);
+  for (let i = 0; i < 5; i++) {
+    const teamId = teams[i].id;
+    const teamPlayersArr = teamPlayers[i];
+    const goalkeeper = drawGoalkeepers[i];
 
-  return withVacancy[0].teamId;
+    teamPlayersArr.map(async (tp) => {
+      await PlayerRepository.insertTeam(tp.id, teamId);
+    });
+
+    await PlayerRepository.insertTeam(goalkeeper.id, teamId);
+  }
 }
