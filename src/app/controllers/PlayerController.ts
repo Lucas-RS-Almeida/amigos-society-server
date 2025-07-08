@@ -55,19 +55,11 @@ class PlayerController {
       //     error: "Voce já se cadastrou.",
       //   });
       // }
-      const teamId = await drawTeam(playerType);
-
-      if (!teamId) {
-        return res.status(400).json({
-          error: `Todos os times estão com ${playerType === "player" ? "jogadores" : "goleiros"} completos.`,
-        });
-      }
 
       const newPlayer = await PlayerRepository.create({
         name,
         playerType,
         matchDay: now,
-        teamId: String(teamId),
         ipPlayer: String(ipPlayer),
       });
 
