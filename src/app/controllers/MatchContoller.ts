@@ -10,11 +10,30 @@ class MatchContoller {
       const matches = await MatchRepository.find(now);
 
       res.json(matches);
-    } catch (error: any) {
-      console.log(error);
-
+    } catch {
       res.status(500).json({
         error: "Houve um erro no servidor ao carregar partidas, tente novamente",
+      });
+    }
+  }
+
+  async endGame(req: Request, res: Response) {
+    const { id } = req.params;
+
+    try {
+      const match = await MatchRepository.findById(id);
+      if (!match) {
+        return res.status(404).json({
+          error: "Partida não encontrada.",
+        });
+      }
+
+      await MatchRepository.endGame(id);
+
+      res.sendStatus(200);
+    } catch {
+      res.status(500).json({
+        error: "Houve um erro no servidor ao finalizar partida, tente novamente",
       });
     }
   }
