@@ -8,7 +8,7 @@ class PlayerController {
     const { matchDay } = req.params;
 
     try {
-      const players = await PlayerRepository.findByMatchDay(matchDay);
+      const players = await PlayerRepository.findByMatchDayWithTeam(matchDay);
 
       res.json(players);
     } catch {
@@ -56,6 +56,25 @@ class PlayerController {
       //   });
       // }
 
+      const players = await PlayerRepository.findByMatchDay(now);
+
+      const playersAmount = players
+        .filter((p) => (p.playerType === "player")).length;
+      const goalkeepersAmount = players
+        .filter((p) => (p.playerType === "goalkeeper")).length;
+
+      if ((playerType === "player") && (playersAmount >= 25)) {
+        return res.status(400).json({
+          error: "Todas as vagas para jogador foram preenchidas.",
+        });
+      }
+
+      if ((playerType === "goalkeeper") && (goalkeepersAmount >= 5)) {
+        return res.status(400).json({
+          error: "Todas as vagas para goleiro foram preenchidas.",
+        });
+      }
+
       const newPlayer = await PlayerRepository.create({
         name,
         playerType,
@@ -67,6 +86,18 @@ class PlayerController {
     } catch {
       res.status(500).json({
         error: "Houve um erro no servidor ao cadastrar, tente novamente.",
+      });
+    }
+  }
+
+  async drawTeam(_: Request, res: Response) {
+    try {
+      await drawTeam();
+
+      res.sendStatus(200);
+    } catch {
+      res.status(500).json({
+        error: "Houve um erro no servidor ao tentar sortear times, tente novamente",
       });
     }
   }
