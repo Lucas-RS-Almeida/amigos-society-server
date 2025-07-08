@@ -25,6 +25,12 @@ routes.post("/auth/sign-up", AuthController.store as any);
 routes.get("/players/:matchDay", auth as any, PlayerController.index);
 routes.get("/players/:matchDay/ip", PlayerController.verify);
 routes.post("/players", PlayerController.store as any);
+routes.put(
+  "/players/draw-team",
+  auth as any,
+  checkUser as any,
+  PlayerController.drawTeam,
+);
 
 // Routes to teams
 routes.get("/teams", TeamController.index);
