@@ -7,7 +7,6 @@ interface ICreateProps {
   name: string;
   playerType: "player" | "goalkeeper";
   matchDay: string;
-  teamId: string;
   ipPlayer: string;
 }
 
