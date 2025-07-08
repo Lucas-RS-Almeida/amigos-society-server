@@ -85,11 +85,14 @@ export const matchesTableRelations = relations(matchesTable, ({ one }) => ({
   }),
 }));
 
-export const matchPlayerTable = pgTable("match_player", {
+export const teamTypeEnum = pgEnum("type_team", ["home", "away"]);
+
+export const statisticsPlayerTable = pgTable("statistics_player", {
   id: uuid("id").primaryKey().notNull().defaultRandom(),
   matchId: uuid("match_id").notNull().references(() => matchesTable.id),
   playerId: uuid("player_id").notNull().references(() => playersTable.id),
   teamId: uuid("team_id").notNull().references(() => teamsTable.id),
+  teamType: teamTypeEnum("team_type").notNull(),
   goals: integer("goals").default(0),
   yellowCards: integer("yellow_cards").default(0),
   redCard: boolean("red_card").default(false),
@@ -100,17 +103,17 @@ export const matchPlayerTable = pgTable("match_player", {
     .$onUpdate(() => new Date()),
 });
 
-export const matchPlayerRelations = relations(matchPlayerTable, ({ one }) => ({
+export const matchPlayerRelations = relations(statisticsPlayerTable, ({ one }) => ({
   match: one(matchesTable, {
-    fields: [matchPlayerTable.matchId],
+    fields: [statisticsPlayerTable.matchId],
     references: [matchesTable.id],
   }),
   player: one(playersTable, {
-    fields: [matchPlayerTable.playerId],
+    fields: [statisticsPlayerTable.playerId],
     references: [playersTable.id],
   }),
   team: one(teamsTable, {
-    fields: [matchPlayerTable.teamId],
+    fields: [statisticsPlayerTable.teamId],
     references: [teamsTable.id],
   }),
 }));
