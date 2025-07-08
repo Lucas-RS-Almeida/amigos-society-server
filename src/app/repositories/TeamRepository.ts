@@ -16,6 +16,15 @@ class TeamRepository {
     return rows;
   }
 
+  async findById(id: string) {
+      const row = await db
+        .select()
+        .from(teamsTable)
+        .where(eq(teamsTable.id, id));
+
+      return row[0];
+    }
+
   async update(id: string, name: string) {
     await db.update(teamsTable).set({ name }).where(eq(teamsTable.id, id));
   }
