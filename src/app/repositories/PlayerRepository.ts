@@ -42,7 +42,7 @@ class PlayerRepository {
       .select()
       .from(playersTable)
       .where(eq(playersTable.matchDay, matchDay))
-      .innerJoin(teamsTable, eq(playersTable.teamId, teamsTable.id));
+      .leftJoin(teamsTable, eq(playersTable.teamId, teamsTable.id));
 
     return rows;
   }
