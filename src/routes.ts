@@ -22,7 +22,7 @@ routes.post("/auth/log-in", AuthController.index as any);
 routes.post("/auth/sign-up", AuthController.store as any);
 
 // Routes to players
-routes.get("/players/:matchDay", auth as any, PlayerController.index);
+routes.get("/players/:matchDay", PlayerController.index);
 routes.get("/players/:matchDay/ip", PlayerController.verify);
 routes.post("/players", PlayerController.store as any);
 routes.put(
